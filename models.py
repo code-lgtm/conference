@@ -26,6 +26,7 @@ class Profile(ndb.Model):
     teeShirtSize = ndb.StringProperty(default='NOT_SPECIFIED')
     conferenceKeysToAttend = ndb.StringProperty(repeated=True)
     conferenceKeysToSpeak = ndb.StringProperty(repeated=True)
+    sessionsToAttend = ndb.StringProperty(repeated=True)
 
 
 # needed for conference registration

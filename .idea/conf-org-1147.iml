@@ -3,12 +3,10 @@
   <component name="FacetManager">
     <facet type="google-appengine-python" name="Google App Engine (Python)">
       <configuration>
-        <option name="rootFolder" value="D:\Workarea\nanodegree\vm\fullstack\vagrant\conf-org-1147" />
+        <option name="rootFolder" value="$USER_HOME$/Desktop/WorkArea/MS/VM/fullstack/vagrant/conference" />
         <option name="sdkFolder" value="D:\google_appengine" />
         <option name="templatesFolder" value="" />
         <option name="oauth2" value="false" />
-        <option name="deployConfigured" value="false" />
-        <option name="saveCredentials" value="true" />
       </configuration>
     </facet>
   </component>

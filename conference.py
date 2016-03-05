@@ -100,7 +100,7 @@ SESS_BEFORE_EXLUDING_POST_REQUEST = endpoints.ResourceContainer(
     sessType=messages.StringField(2, required=True),
 )
 
-WISH_POST_REQUEST = endpoints.ResourceContainer(
+WISH_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
     websafeSessionKey=messages.StringField(1, required=True),
 )
@@ -352,6 +352,10 @@ class ConferenceApi(remote.Service):
             raise endpoints.NotFoundException(
                 'No conference found with key: %s' % request.websafeConferenceKey)
         prof = conf.key.parent().get()
+
+        if not prof:
+            raise endpoints.NotFoundException('Not able to get prof')
+
         # return ConferenceForm
         return self._copyConferenceToForm(conf, getattr(prof, 'displayName'))
 
@@ -702,7 +706,8 @@ class ConferenceApi(remote.Service):
             items=[self._copySessionToForm(sess) for sess in sessions]
         )
 
-    @endpoints.method(WISH_POST_REQUEST, SessionForm,
+    @ndb.transactional(xg=True)
+    @endpoints.method(WISH_REQUEST, SessionForm,
                       http_method='POST', name='addSessionToWishlist')
     def addSessionToWishlist(self, request):
         """Saves a session to a user's wishlist"""
@@ -752,6 +757,35 @@ class ConferenceApi(remote.Service):
         return SessionForms(
             items=[self._copySessionToForm(sess) for sess in sessions]
         )
+
+    @ndb.transactional(xg=True)
+    @endpoints.method(WISH_REQUEST, BooleanMessage,
+                      path='wishlist/{websafeSessionKey}',
+                      http_method='DELETE', name='deleteSessionInWishlist')
+    def removeSessionFromWishlist(self, request):
+        """Remove the specified session from wishlist."""
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('You must be logged in to do this')
+
+        # get session from the key and ensure it exists
+        sess = ndb.Key(urlsafe=request.websafeSessionKey).get()
+
+        # check that session exists
+        if not sess:
+            raise endpoints.NotFoundException(
+                'No session found with key: %s' % request.websafeSessionKey)
+
+        # get user profile
+        prof = self._getProfileFromUser()
+
+        retVal = False
+        if request.websafeSessionKey in prof.sessionsToAttend:
+            prof.sessionsToAttend.remove(request.websafeSessionKey)
+            retVal = True
+            prof.put()
+            sess.put()
+        return BooleanMessage(data=retVal)
 
 # registers API
 api = endpoints.api_server([ConferenceApi])
