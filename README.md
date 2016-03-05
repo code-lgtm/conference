@@ -1,10 +1,5 @@
 # conference
-# App Engine application for the Udacity training course.
-
-### Description:
-
-Full Stack Nanodegree Project 4
-
+# Fullstack Nanodegree Project 4
 
 ### 1: Add Sessions to a Conference
 
@@ -55,7 +50,7 @@ Endpoints added include:
 Note: To deploy this API server locally the [Google App Engine SDK for Python](https://cloud.google.com/appengine/downloads) is required.
 
 1. Clone the git repository (or download it from the submission)
-2. Run `dev_appserver.py DIR` or launch the app from the GUI app launcher Google provides in their API download.  Ensure it's running by visiting your local server's address, which is likely to be [localhost:8080][5]].
+2. Run `dev_appserver.py DIR` or launch the app from the GUI app launcher Google provides in their API download.  Ensure it's running by visiting your local server's address 
 
 Optionally you can follow these instructions to set it up for your own deplayment:
 
