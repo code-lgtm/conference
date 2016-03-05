@@ -14,12 +14,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# !/usr/bin/env python
 import webapp2
+from google.appengine.api import app_identity
+from google.appengine.api import mail
+from conference import ConferenceApi
 
-class MainHandler(webapp2.RequestHandler):
+
+class SetAnnouncementHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write('Hello world!')
+        """Set Announcement in Memcache."""
+        ConferenceApi._cacheAnnouncement()
+        self.response.set_status(204)
+
+class FeaturedSpeakerHandler(webapp2.RequestHandler):
+    def post(self):
+        """Set featured speaker in Memcache if appropriate"""
+        ConferenceApi._cacheFeaturedSpeaker(self.request.get('speaker'))
+        self.response.set_status(204)
+
+class SendConfirmationEmailHandler(webapp2.RequestHandler):
+    def post(self):
+        """Send email confirming Conference creation."""
+        mail.send_mail(
+            'noreply@%s.appspotmail.com' % (
+                app_identity.get_application_id()),     # from
+            self.request.get('email'),                  # to
+            'You created a new Conference!',            # subj
+            'Hi, you have created a following '         # body
+            'conference:\r\n\r\n%s' % self.request.get(
+                'conferenceInfo')
+        )
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/crons/set_announcement', SetAnnouncementHandler),
+    ('/tasks/check_and_add_featured_speaker', FeaturedSpeakerHandler),
+    ('/tasks/send_confirmation_email', SendConfirmationEmailHandler),
 ], debug=True)

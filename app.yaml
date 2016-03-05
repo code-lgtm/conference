@@ -34,6 +34,16 @@ handlers:       # static then dynamic
   script: conference.api
   secure: always
 
+- url: /tasks/send_confirmation_email
+  script: main.app
+
+- url: /tasks/check_and_add_featured_speaker
+  script: main.app
+
+- url: /crons/set_announcement
+  script: main.app
+  login: admin
+
 libraries:
 
 - name: endpoints
